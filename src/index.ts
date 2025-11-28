@@ -1,16 +1,16 @@
 /**
- * vitest-drizzle-environment
+ * @siu-issiki/vitest-drizzle-environment
  *
- * VitestテストでDrizzle ORM (PostgreSQL) を使用する際に、
- * テストケースごとに自動でトランザクションをロールバックする機能を提供します。
+ * Provides automatic transaction rollback per test case when using
+ * Drizzle ORM (PostgreSQL) in Vitest tests.
  *
- * jest-prismaにインスパイアされた実装で、各テストを独立したトランザクション内で
- * 実行し、テスト終了時に自動でロールバックします。
+ * Inspired by jest-prisma, each test runs within an isolated transaction
+ * that automatically rolls back when the test ends.
  *
  * @example
  * ```ts
- * // setup.ts (vitest.config.tsのsetupFilesで指定)
- * import { setupDrizzleEnvironment } from "vitest-drizzle-environment";
+ * // setup.ts (specified in vitest.config.ts setupFiles)
+ * import { setupDrizzleEnvironment } from "@siu-issiki/vitest-drizzle-environment";
  * import { db } from "./db";
  *
  * setupDrizzleEnvironment({
@@ -20,21 +20,21 @@
  *
  * @example
  * ```ts
- * // テストファイル
+ * // Test file
  * test("creates a user", async () => {
  *   await vitestDrizzle.client.insert(users).values({ name: "test" });
  *   const result = await vitestDrizzle.client.select().from(users);
  *   expect(result).toHaveLength(1);
- * }); // テスト終了時に自動でロールバック
+ * }); // Automatically rolls back when test ends
  * ```
  */
 
-// 型定義をエクスポート
+// Export type definitions
 export type {
   DrizzleEnvironmentOptions,
   TransactionCapableClient,
   VitestDrizzleContext,
 } from './types';
 
-// セットアップ関数をエクスポート
+// Export setup function
 export { setupDrizzleEnvironment } from './setup';

@@ -1,61 +1,60 @@
 # Contributing
 
-vitest-drizzle-environment へのコントリビューションを歓迎します！
+Contributions to @siu-issiki/vitest-drizzle-environment are welcome!
 
-## 開発環境のセットアップ
+## Development Environment Setup
 
-### 必要なもの
+### Requirements
 
 - Node.js 18+
 - pnpm
-- Docker（PostgreSQLを起動するため）
+- Docker (to run PostgreSQL)
 
-### セットアップ手順
+### Setup Steps
 
 ```bash
-# リポジトリをクローン
+# Clone the repository
 git clone https://github.com/siu-issiki/vitest-drizzle-environment.git
 cd vitest-drizzle-environment
 
-# 依存関係をインストール
+# Install dependencies
 pnpm install
 
-# PostgreSQLを起動
+# Start PostgreSQL
 docker compose up -d
 
-# ビルド
+# Build
 pnpm build
 
-# テスト用の依存関係をインストール
+# Install test dependencies
 pnpm test:install
 
-# テストを実行
+# Run tests
 pnpm test
 ```
 
-## プルリクエストの作成
+## Creating Pull Requests
 
-1. このリポジトリをフォーク
-2. 機能ブランチを作成 (`git checkout -b feature/amazing-feature`)
-3. 変更をコミット (`git commit -m 'Add amazing feature'`)
-4. ブランチをプッシュ (`git push origin feature/amazing-feature`)
-5. プルリクエストを作成
+1. Fork this repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push the branch (`git push origin feature/amazing-feature`)
+5. Create a Pull Request
 
-## コーディング規約
+## Coding Guidelines
 
-- TypeScriptを使用し、strict modeを維持
-- ESMモジュール形式を使用
-- コードにはJSDocコメントを追加
-- テストを書く
+- Use TypeScript and maintain strict mode
+- Use ESM module format
+- Add JSDoc comments to your code
+- Write tests
 
-## Issue の報告
+## Reporting Issues
 
-バグを発見した場合や機能リクエストがある場合は、GitHubのIssueで報告してください。
+If you find a bug or have a feature request, please report it via GitHub Issues.
 
-- バグの場合: 再現手順、期待される動作、実際の動作を記載
-- 機能リクエストの場合: ユースケースと提案する解決策を記載
+- For bugs: Include reproduction steps, expected behavior, and actual behavior
+- For feature requests: Include the use case and proposed solution
 
-## ライセンス
+## License
 
-コントリビューションはMITライセンスの下で提供されます。
-
+Contributions are provided under the MIT License.

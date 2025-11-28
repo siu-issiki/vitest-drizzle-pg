@@ -1,14 +1,14 @@
 import type { VitestDrizzleContext } from './types';
 
 /**
- * グローバル変数の型定義
- * テストファイル内でvitestDrizzleを使用するために必要
+ * Global variable type definitions
+ * Required to use vitestDrizzle in test files
  */
 declare global {
   /**
-   * Drizzleテスト環境のグローバルコンテキスト
-   * setupDrizzleEnvironment()またはuseDrizzleTransaction()を呼び出した後、
-   * 各テストケース内でアクセス可能
+   * Global context for the Drizzle test environment
+   * Accessible within each test case after calling
+   * setupDrizzleEnvironment() or useDrizzleTransaction()
    */
   // eslint-disable-next-line no-var
   var vitestDrizzle: VitestDrizzleContext;

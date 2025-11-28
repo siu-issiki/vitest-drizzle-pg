@@ -1,15 +1,15 @@
 /**
- * Drizzleを使ったビジネスロジックの例
+ * Example business logic using Drizzle
  *
- * DBクライアントは client.ts から取得
- * テスト時は client.ts をモックすることで vitestDrizzle.client を使用
+ * DB client is obtained from client.ts
+ * During tests, client.ts is mocked to use vitestDrizzle.client
  */
 
 import { eq } from 'drizzle-orm';
 import { getClient } from './client';
 import { users, posts } from './schema';
 
-// ユーザー関連の操作
+// User operations
 export async function createUser(name: string, email: string) {
   const [user] = await getClient()
     .insert(users)
@@ -40,7 +40,7 @@ export async function getUserCount() {
   return result.length;
 }
 
-// 投稿関連の操作
+// Post operations
 export async function createPost(
   title: string,
   content: string,
@@ -61,7 +61,7 @@ export async function getAllPosts() {
   return getClient().select().from(posts);
 }
 
-// ユーザーと投稿を同時に作成する複合操作
+// Composite operation to create user and posts simultaneously
 export async function createUserWithPosts(
   name: string,
   email: string,
@@ -70,7 +70,7 @@ export async function createUserWithPosts(
   const user = await createUser(name, email);
 
   const createdPosts = await Promise.all(
-    postTitles.map((title) => createPost(title, `${title}の内容`, user.id))
+    postTitles.map((title) => createPost(title, `Content of ${title}`, user.id))
   );
 
   return { user, posts: createdPosts };

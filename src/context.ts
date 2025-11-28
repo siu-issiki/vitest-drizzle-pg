@@ -6,13 +6,13 @@ import type {
 import { RollbackError } from './types';
 
 /**
- * テスト環境のコンテキストを管理するクラス
+ * Class that manages the context of the test environment
  *
- * jest-prismaと同様のPromise保留パターンを使用:
- * 1. トランザクションを開始
- * 2. トランザクション内でPromiseを返し、resolveを保持
- * 3. テスト終了時にreject()を呼び出してロールバック
- * 4. .catch(() => true) でUnhandled Rejectionを防ぐ
+ * Uses the same Promise pending pattern as jest-prisma:
+ * 1. Start a transaction
+ * 2. Return a Promise within the transaction and hold the resolve
+ * 3. Call reject() to rollback when the test ends
+ * 4. Use .catch(() => true) to prevent Unhandled Rejection
  */
 export class DrizzleEnvironmentContext<
   TDatabase extends TransactionCapableClient<TTransaction>,
@@ -33,14 +33,14 @@ export class DrizzleEnvironmentContext<
   }
 
   /**
-   * 環境を初期化する
+   * Initialize the environment
    */
   async setup(): Promise<void> {
     this.state.db = (await this.options.client()) as TDatabase;
   }
 
   /**
-   * 環境をクリーンアップする
+   * Clean up the environment
    */
   async teardown(): Promise<void> {
     if (this.options.disconnect) {
@@ -50,13 +50,13 @@ export class DrizzleEnvironmentContext<
   }
 
   /**
-   * テストケースごとにトランザクションを開始する
+   * Start a transaction for each test case
    *
-   * jest-prismaと同様のPromise保留パターン:
-   * 1. db.transaction() を呼び出し
-   * 2. コールバック内で新しいPromiseを返す
-   * 3. そのPromiseのrejectを保持
-   * 4. endTransaction()でreject()を呼び出してロールバック
+   * Promise pending pattern similar to jest-prisma:
+   * 1. Call db.transaction()
+   * 2. Return a new Promise within the callback
+   * 3. Hold the reject of that Promise
+   * 4. Call reject() in endTransaction() to rollback
    */
   async beginTransaction(): Promise<TTransaction> {
     if (!this.state.db) {
@@ -66,37 +66,37 @@ export class DrizzleEnvironmentContext<
     }
 
     return new Promise<TTransaction>((resolveOuter) => {
-      // トランザクションを開始し、Promise保留パターンを使用
+      // Start transaction using Promise pending pattern
       this.state.transactionPromise = this.state
         .db!.transaction(async (tx) => {
           this.state.currentTransaction = tx as TTransaction;
 
-          // オプションのセットアップ関数を実行
+          // Execute optional setup function
           if (this.options.setup) {
             await this.options.setup(tx as TTransaction);
           }
 
-          // 外部にトランザクションを渡す（テストコードに制御を戻す）
+          // Pass transaction to outer scope (return control to test code)
           resolveOuter(tx as TTransaction);
 
-          // endTransaction()が呼ばれるまでPromiseを保留
-          // rejectが呼ばれるとトランザクションはロールバックされる
+          // Keep Promise pending until endTransaction() is called
+          // When reject is called, the transaction will be rolled back
           return new Promise<void>((_, reject) => {
             this.state.resolveTransaction = () => reject(new RollbackError());
           });
         })
         .catch(() => {
-          // jest-prismaと同様: .catch(() => true) でUnhandled Rejectionを防ぐ
-          // RollbackErrorを含む全てのエラーをここで握りつぶす
+          // Same as jest-prisma: use .catch(() => true) to prevent Unhandled Rejection
+          // Swallow all errors including RollbackError here
         }) as Promise<void>;
     });
   }
 
   /**
-   * トランザクションをロールバックする
+   * Rollback the transaction
    */
   async rollbackTransaction(): Promise<void> {
-    // オプションのテアダウン関数を実行
+    // Execute optional teardown function
     if (this.options.teardown && this.state.currentTransaction) {
       try {
         await this.options.teardown(this.state.currentTransaction);
@@ -105,18 +105,18 @@ export class DrizzleEnvironmentContext<
       }
     }
 
-    // トランザクションを終了（ロールバックをトリガー）
+    // End transaction (trigger rollback)
     if (this.state.resolveTransaction) {
       this.state.resolveTransaction();
       this.state.resolveTransaction = null;
     }
 
-    // トランザクションPromiseの完了を待つ
+    // Wait for transaction Promise to complete
     if (this.state.transactionPromise) {
       try {
         await this.state.transactionPromise;
       } catch {
-        // エラーは無視（既に.catch(() => true)で処理済み）
+        // Ignore errors (already handled by .catch(() => true))
       }
       this.state.transactionPromise = null;
     }
@@ -125,14 +125,14 @@ export class DrizzleEnvironmentContext<
   }
 
   /**
-   * 現在のトランザクションを取得
+   * Get the current transaction
    */
   getCurrentTransaction(): TTransaction | null {
     return this.state.currentTransaction;
   }
 
   /**
-   * データベースクライアントを取得
+   * Get the database client
    */
   getDatabase(): TDatabase | null {
     return this.state.db;

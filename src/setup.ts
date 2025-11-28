@@ -7,32 +7,17 @@ import type {
 } from './types';
 
 /**
- * vitestDrizzleグローバル変数を設定
- */
-function setGlobalVitestDrizzle<TTransaction>(
-  client: TTransaction | null
-): void {
-  (
-    globalThis as unknown as {
-      vitestDrizzle: VitestDrizzleContext<TTransaction>;
-    }
-  ).vitestDrizzle = {
-    client: client as TTransaction,
-  };
-}
-
-/**
- * Drizzleテスト環境をセットアップする
+ * Set up the Drizzle test environment
  *
- * この関数をdescribeブロック内、テストファイルのトップレベル、
- * またはVitestのセットアップファイル（vitest.config.tsのsetupFiles）で呼び出すと、
- * 各テストケースが自動的にトランザクション内で実行され、
- * テスト終了時にロールバックされる。
+ * Call this function within a describe block, at the top level of a test file,
+ * or in a Vitest setup file (specified in vitest.config.ts setupFiles).
+ * Each test case will automatically run within a transaction that
+ * rolls back when the test ends.
  *
  * @example
  * ```ts
- * // setup.ts (vitest.config.tsのsetupFilesで指定)
- * import { setupDrizzleEnvironment } from "vitest-drizzle-environment";
+ * // setup.ts (specified in vitest.config.ts setupFiles)
+ * import { setupDrizzleEnvironment } from "@siu-issiki/vitest-drizzle-environment";
  * import { db } from "./db";
  *
  * setupDrizzleEnvironment({
@@ -42,12 +27,12 @@ function setGlobalVitestDrizzle<TTransaction>(
  *
  * @example
  * ```ts
- * // テストファイル
+ * // Test file
  * test("creates a user", async () => {
  *   await vitestDrizzle.client.insert(users).values({ name: "test" });
  *   const result = await vitestDrizzle.client.select().from(users);
  *   expect(result).toHaveLength(1);
- * }); // テスト終了時に自動でロールバック
+ * }); // Automatically rolls back when test ends
  * ```
  */
 export function setupDrizzleEnvironment<
@@ -58,21 +43,37 @@ export function setupDrizzleEnvironment<
     options
   );
 
-  // テストスイートの最初にDBクライアントを初期化
+  const vitestDrizzleProxy: VitestDrizzleContext<TTransaction> = {
+    get client() {
+      const tx = context.getCurrentTransaction();
+      if (!tx) {
+        console.warn(
+          'vitestDrizzle.client should be used in test or beforeEach functions because transaction has not yet started.'
+        );
+      }
+      return tx as TTransaction;
+    },
+  };
+
+  (
+    globalThis as unknown as {
+      vitestDrizzle: VitestDrizzleContext<TTransaction>;
+    }
+  ).vitestDrizzle = vitestDrizzleProxy;
+
+  // Initialize DB client at the start of the test suite
   beforeEach(async () => {
-    // コンテキストが初期化されていなければ初期化
+    // Initialize context if not already initialized
     if (!context.getDatabase()) {
       await context.setup();
     }
 
-    // トランザクションを開始
-    const tx = await context.beginTransaction();
-    setGlobalVitestDrizzle(tx);
+    // Start transaction
+    await context.beginTransaction();
   });
 
-  // 各テスト終了時にロールバック
+  // Rollback after each test
   afterEach(async () => {
     await context.rollbackTransaction();
-    setGlobalVitestDrizzle(null);
   });
 }

@@ -1,7 +1,7 @@
 /**
- * DBクライアントを提供するモジュール
+ * Module that provides the DB client
  *
- * テスト時はこのモジュールをモックして vitestDrizzle.client を返す
+ * During tests, this module is mocked to return vitestDrizzle.client
  */
 
 import { db } from './db';

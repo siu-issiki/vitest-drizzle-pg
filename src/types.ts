@@ -1,36 +1,36 @@
 /**
- * Drizzle環境のオプション設定
+ * Configuration options for the Drizzle environment
  */
 export interface DrizzleEnvironmentOptions<
   TDatabase = unknown,
   TTransaction = unknown
 > {
   /**
-   * Drizzleインスタンスを提供する関数
-   * テストスイートごとに呼び出され、トランザクション管理に使用される
+   * Function that provides the Drizzle instance
+   * Called once per test suite and used for transaction management
    */
   client: () => TDatabase | Promise<TDatabase>;
 
   /**
-   * 各テストケースの前に実行されるセットアップ関数（オプション）
+   * Optional setup function executed before each test case
    */
   setup?: (tx: TTransaction) => void | Promise<void>;
 
   /**
-   * 各テストケースの後に実行されるクリーンアップ関数（オプション）
-   * rollback前に呼び出される
+   * Optional cleanup function executed after each test case
+   * Called before rollback
    */
   teardown?: (tx: TTransaction) => void | Promise<void>;
 
   /**
-   * データベース接続を終了する関数（オプション）
-   * テストスイート終了時に呼び出される
+   * Optional function to close the database connection
+   * Called when the test suite ends
    */
   disconnect?: () => void | Promise<void>;
 }
 
 /**
- * トランザクションをサポートするDrizzleクライアントのインターフェース
+ * Interface for a Drizzle client that supports transactions
  */
 export interface TransactionCapableClient<TTransaction = unknown> {
   transaction<T>(
@@ -40,18 +40,18 @@ export interface TransactionCapableClient<TTransaction = unknown> {
 }
 
 /**
- * vitestDrizzleグローバル変数の型
+ * Type for the vitestDrizzle global variable
  */
 export interface VitestDrizzleContext<TTransaction = unknown> {
   /**
-   * 現在のテストケースで使用できるトランザクション
-   * このトランザクションはテスト終了時に自動でrollbackされる
+   * Transaction available for use in the current test case
+   * This transaction is automatically rolled back when the test ends
    */
   client: TTransaction;
 }
 
 /**
- * グローバル変数の型定義
+ * Global variable type definitions
  */
 declare global {
   // eslint-disable-next-line no-var
@@ -59,7 +59,7 @@ declare global {
 }
 
 /**
- * テスト環境の状態
+ * State of the test environment
  */
 export interface EnvironmentState<TDatabase = unknown, TTransaction = unknown> {
   db: TDatabase | null;
@@ -70,8 +70,8 @@ export interface EnvironmentState<TDatabase = unknown, TTransaction = unknown> {
 }
 
 /**
- * Rollback専用のエラー
- * トランザクションを強制的にrollbackするために使用
+ * Error class dedicated to rollback
+ * Used to forcefully rollback a transaction
  */
 export class RollbackError extends Error {
   constructor() {

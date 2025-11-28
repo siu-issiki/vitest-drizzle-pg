@@ -1,15 +1,15 @@
 /**
- * Vitest セットアップファイル
+ * Vitest setup file
  *
- * このファイルで setupDrizzleEnvironment を呼び出すことで、
- * 全てのテストファイルで自動的にトランザクション管理が有効になります。
+ * By calling setupDrizzleEnvironment in this file,
+ * transaction management is automatically enabled for all test files.
  */
 
 import { beforeAll, afterAll } from 'vitest';
-import { setupDrizzleEnvironment } from 'vitest-drizzle-environment';
+import { setupDrizzleEnvironment } from '@siu-issiki/vitest-drizzle-environment';
 import { db, initDb, dropTables, closeDb } from './db';
 
-// テスト前後のセットアップ
+// Setup before and after tests
 beforeAll(async () => {
   await dropTables();
   await initDb();
@@ -19,8 +19,8 @@ afterAll(async () => {
   await closeDb();
 });
 
-// Drizzle環境をセットアップ
-// これにより、全テストがトランザクション内で実行され、終了時に自動ロールバックされる
+// Set up Drizzle environment
+// This ensures all tests run within a transaction and auto-rollback when finished
 setupDrizzleEnvironment({
   client: () => db,
 });

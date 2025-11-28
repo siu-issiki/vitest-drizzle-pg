@@ -2,7 +2,7 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import * as schema from './schema';
 
-// PostgreSQL接続プール
+// PostgreSQL connection pool
 const pool = new Pool({
   host: process.env.POSTGRES_HOST ?? 'localhost',
   port: Number(process.env.POSTGRES_PORT ?? 5432),
@@ -13,12 +13,12 @@ const pool = new Pool({
 
 export const db = drizzle(pool, { schema });
 
-// データベース接続を閉じる
+// Close database connection
 export async function closeDb(): Promise<void> {
   await pool.end();
 }
 
-// テーブルを作成（テスト用）
+// Create tables (for testing)
 export async function initDb(): Promise<void> {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS users (
@@ -40,7 +40,7 @@ export async function initDb(): Promise<void> {
   `);
 }
 
-// テーブルを削除（テスト用）
+// Drop tables (for testing)
 export async function dropTables(): Promise<void> {
   await pool.query('DROP TABLE IF EXISTS posts CASCADE');
   await pool.query('DROP TABLE IF EXISTS users CASCADE');

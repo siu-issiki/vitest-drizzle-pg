@@ -1,90 +1,45 @@
-# vitest-drizzle-environment
+# @siu-issiki/vitest-drizzle-environment
 
-Vitestテスト環境でDrizzle ORM (PostgreSQL) を使用する際に、**テストケースごとに自動でトランザクションをロールバック**する機能を提供します。
+[![npm version](https://img.shields.io/npm/v/@siu-issiki/vitest-drizzle-environment.svg)](https://www.npmjs.com/package/@siu-issiki/vitest-drizzle-environment)
+[![CI](https://github.com/siu-issiki/vitest-drizzle-environment/actions/workflows/test.yml/badge.svg)](https://github.com/siu-issiki/vitest-drizzle-environment/actions/workflows/test.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-[jest-prisma](https://github.com/Quramy/jest-prisma)にインスパイアされた実装で、各テストを独立したトランザクション内で実行し、テスト終了時に自動でロールバックすることで、テスト間のデータ分離を実現します。
+A Vitest environment for Drizzle ORM (PostgreSQL) that provides **automatic transaction rollback per test case**.
 
-## 特徴
+Inspired by [jest-prisma](https://github.com/Quramy/jest-prisma), this library executes each test within an isolated transaction and automatically rolls back at the end of the test, ensuring data isolation between tests.
 
-- 🔄 **自動ロールバック**: 各テストケース終了時にトランザクションが自動でロールバックされる
-- 🧪 **テスト分離**: テスト間でデータベースの状態が共有されない
-- 🚀 **高速**: 実際のDB操作を行いながら、ロールバックにより高速なテスト実行
-- 🐘 **PostgreSQL特化**: node-postgresとの最適な統合
+## Features
 
-## インストール
+- 🔄 **Automatic Rollback**: Transactions are automatically rolled back at the end of each test case
+- 🧪 **Test Isolation**: Database state is not shared between tests
+- 🚀 **Fast**: Real DB operations with rollback for fast test execution
+- 🐘 **PostgreSQL Optimized**: Optimal integration with node-postgres
 
-```bash
-npm install -D vitest-drizzle-environment
-# または
-pnpm add -D vitest-drizzle-environment
-# または
-yarn add -D vitest-drizzle-environment
-```
-
-## クイックスタート
-
-### 1. Docker でPostgreSQLを起動
-
-```yaml
-# docker-compose.yml
-services:
-  postgres:
-    image: postgres:16-alpine
-    ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_USER: test
-      POSTGRES_PASSWORD: test
-      POSTGRES_DB: test
-```
+## Installation
 
 ```bash
-docker compose up -d
+npm install -D @siu-issiki/vitest-drizzle-environment
+# or
+pnpm add -D @siu-issiki/vitest-drizzle-environment
+# or
+yarn add -D @siu-issiki/vitest-drizzle-environment
 ```
 
-### 2. Drizzle ORMのセットアップ
+## Quick Start
 
-```typescript
-// db.ts
-import { drizzle } from 'drizzle-orm/node-postgres';
-import { Pool } from 'pg';
-import * as schema from './schema';
-
-const pool = new Pool({
-  host: 'localhost',
-  port: 5432,
-  user: 'test',
-  password: 'test',
-  database: 'test',
-});
-
-export const db = drizzle(pool, { schema });
-```
-
-### 3. Vitestセットアップファイルを作成
+### 1. Create Setup File
 
 ```typescript
 // setup.ts
-import { beforeAll, afterAll } from 'vitest';
-import { setupDrizzleEnvironment } from 'vitest-drizzle-environment';
-import { db } from './db';
+import { setupDrizzleEnvironment } from '@siu-issiki/vitest-drizzle-environment';
+import { db } from './db'; // Your Drizzle instance
 
-// テスト前後のセットアップ
-beforeAll(async () => {
-  // テーブル作成など
-});
-
-afterAll(async () => {
-  // DB接続のクローズなど
-});
-
-// Drizzle環境をセットアップ
 setupDrizzleEnvironment({
   client: () => db,
 });
 ```
 
-### 4. Vitest設定でセットアップファイルを指定
+### 2. Configure Vitest
 
 ```typescript
 // vitest.config.ts
@@ -94,46 +49,39 @@ export default defineConfig({
   test: {
     globals: true,
     setupFiles: ['./setup.ts'],
-    // テストを順次実行（DBの整合性を保つため）
-    pool: 'forks',
-    poolOptions: {
-      forks: {
-        singleFork: true,
-      },
-    },
   },
 });
 ```
 
-### 5. テストを書く
+### 3. Write Tests
 
 ```typescript
 // users.test.ts
 import { describe, test, expect } from 'vitest';
 import { users } from './schema';
 
-test('ユーザーを作成できる', async () => {
-  // vitestDrizzle.client はトランザクション内のクライアント
+test('can create a user', async () => {
+  // vitestDrizzle.client is the transaction client
   await vitestDrizzle.client.insert(users).values({
-    name: 'テストユーザー',
+    name: 'Test User',
     email: 'test@example.com',
   });
 
   const result = await vitestDrizzle.client.select().from(users);
   expect(result).toHaveLength(1);
-}); // ← テスト終了時に自動でロールバック
+}); // ← Automatically rolled back at test end
 
-test('前のテストのデータは存在しない', async () => {
+test('previous test data does not exist', async () => {
   const result = await vitestDrizzle.client.select().from(users);
-  expect(result).toHaveLength(0); // ロールバックされている！
+  expect(result).toHaveLength(0); // Rolled back!
 });
 ```
 
-## ビジネスロジックとの統合
+## Integration with Business Logic
 
-テストファイルで `vitestDrizzle.client` を直接使う代わりに、ビジネスロジック側でDBクライアントを抽象化し、テストでモックすることを推奨します。
+Instead of using `vitestDrizzle.client` directly in test files, we recommend abstracting the DB client in your business logic and mocking it in tests.
 
-### 1. クライアントモジュールを作成
+### 1. Create a Client Module
 
 ```typescript
 // client.ts
@@ -144,7 +92,7 @@ export function getClient() {
 }
 ```
 
-### 2. ビジネスロジックでクライアントモジュールを使用
+### 2. Use the Client Module in Business Logic
 
 ```typescript
 // users.ts
@@ -164,25 +112,25 @@ export async function getAllUsers() {
 }
 ```
 
-### 3. テストでクライアントモジュールをモック
+### 3. Mock the Client Module in Tests
 
 ```typescript
 // users.test.ts
 import { describe, test, expect, vi } from 'vitest';
 
-// client.ts をモックして vitestDrizzle.client を返す
+// Mock client.ts to return vitestDrizzle.client
 vi.mock('./client', () => ({
   getClient: () => vitestDrizzle.client,
 }));
 
 import { createUser, getAllUsers } from './users';
 
-test('ユーザーを作成できる', async () => {
-  const user = await createUser('テストユーザー', 'test@example.com');
-  expect(user.name).toBe('テストユーザー');
+test('can create a user', async () => {
+  const user = await createUser('Test User', 'test@example.com');
+  expect(user.name).toBe('Test User');
 });
 
-test('前のテストのデータは存在しない', async () => {
+test('previous test data does not exist', async () => {
   const users = await getAllUsers();
   expect(users).toHaveLength(0);
 });
@@ -192,39 +140,39 @@ test('前のテストのデータは存在しない', async () => {
 
 ### `setupDrizzleEnvironment(options)`
 
-Vitestのセットアップファイルで呼び出し、各テストを自動的にトランザクション内で実行します。
+Call this in your Vitest setup file to automatically execute each test within a transaction.
 
 ```typescript
 setupDrizzleEnvironment({
-  // 必須: Drizzleインスタンスを返す関数
+  // Required: Function that returns the Drizzle instance
   client: () => db,
   
-  // オプション: 各テストの前に実行されるセットアップ関数
+  // Optional: Setup function executed before each test
   setup: async (tx) => {
-    // 初期データの投入など（トランザクション内で実行）
+    // Insert seed data, etc. (executed within the transaction)
     await tx.insert(users).values({ name: 'Admin', email: 'admin@example.com' });
   },
   
-  // オプション: 各テストの後（ロールバック前）に実行されるクリーンアップ関数
+  // Optional: Cleanup function executed after each test (before rollback)
   teardown: async (tx) => {
-    // クリーンアップ処理
+    // Cleanup operations
   },
   
-  // オプション: テストスイート終了時にDB接続を閉じる関数
+  // Optional: Function to close DB connection at the end of test suite
   disconnect: async () => {
     await pool.end();
   },
 });
 ```
 
-## 型安全性
+## Type Safety
 
-TypeScriptを使用している場合、グローバル型定義を追加することで`vitestDrizzle.client`の型推論を有効にできます。
+When using TypeScript, you can enable type inference for `vitestDrizzle.client` by adding a global type definition.
 
 ```typescript
 // env.d.ts
 import type { db } from './db';
-import type { VitestDrizzleContext } from 'vitest-drizzle-environment';
+import type { VitestDrizzleContext } from '@siu-issiki/vitest-drizzle-environment';
 
 type DrizzleTransaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
@@ -235,70 +183,70 @@ declare global {
 export {};
 ```
 
-## 動作原理
+## How It Works
 
-jest-prismaと同様の**Promise保留パターン**を使用しています:
+This library uses a **Promise pending pattern** similar to jest-prisma:
 
-1. 各テストケースの開始時に`db.transaction()`でトランザクションを開始
-2. トランザクション内で新しいPromiseを作成し、`reject`関数を保持
-3. テストコードにトランザクションクライアントを渡す
-4. テスト終了時に`reject()`を呼び出してロールバックをトリガー
-5. `.catch(() => {})` でUnhandled Rejectionを防ぐ
+1. Start a transaction with `db.transaction()` at the beginning of each test case
+2. Create a new Promise within the transaction and hold the `reject` function
+3. Pass the transaction client to the test code
+4. Call `reject()` at test end to trigger rollback
+5. Use `.catch(() => {})` to prevent Unhandled Rejection
 
 ```typescript
-// 内部実装のイメージ
+// Internal implementation concept
 async beginTransaction() {
   return new Promise((resolveOuter) => {
     db.transaction(async (tx) => {
-      // テストコードに制御を戻す
+      // Return control to test code
       resolveOuter(tx);
       
-      // テスト終了まで待機
+      // Wait until test ends
       return new Promise((_, reject) => {
         this.triggerRollback = () => reject(new RollbackError());
       });
-    }).catch(() => {}); // ロールバックエラーを握りつぶす
+    }).catch(() => {}); // Swallow rollback error
   });
 }
 ```
 
-## 開発
+## Development
 
 ```bash
-# PostgreSQLを起動
+# Start PostgreSQL
 docker compose up -d
 
-# 依存関係をインストール
+# Install dependencies
 pnpm install
 
-# ビルド
+# Build
 pnpm build
 
-# テスト用の依存関係をインストール（ローカルパッケージとしてインストール）
+# Install test dependencies (as local package)
 pnpm test:install
 
-# テスト実行
+# Run tests
 pnpm test
 
-# ウォッチモードでテスト
+# Run tests in watch mode
 pnpm test:watch
 ```
 
-### プロジェクト構成
+### Project Structure
 
 ```
 vitest-drizzle-environment/
-├── src/                    # ライブラリのソースコード
-├── dist/                   # ビルド成果物
-├── test/                   # テスト（独立したパッケージ）
-│   ├── package.json        # file:.. でローカルパッケージをインストール
+├── src/                    # Library source code
+├── dist/                   # Build output
+├── test/                   # Tests (independent package)
+│   ├── package.json        # Installs local package with file:..
 │   └── *.test.ts
 ├── docker-compose.yml
 └── package.json
 ```
 
-`test/` ディレクトリは独立した `package.json` を持ち、`vitest-drizzle-environment` を `file:..` でローカルパッケージとしてインストールしています。これにより、実際のパッケージ利用者と同じ体験でテストできます。
+The `test/` directory has its own `package.json` and installs `@siu-issiki/vitest-drizzle-environment` as a local package using `file:..`. This allows testing with the same experience as actual package users.
 
-## ライセンス
+## License
 
 MIT

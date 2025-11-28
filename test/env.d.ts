@@ -1,7 +1,7 @@
 import type { db } from './db';
-import type { VitestDrizzleContext } from 'vitest-drizzle-environment';
+import type { VitestDrizzleContext } from '@siu-issiki/vitest-drizzle-environment';
 
-// db.transaction() のコールバック引数の型を取得
+// Get the type of the callback argument for db.transaction()
 type DrizzleTransaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
 declare global {
