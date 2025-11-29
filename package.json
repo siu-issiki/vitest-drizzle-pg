@@ -1,5 +1,5 @@
 {
-  "name": "@siu-issiki/vitest-drizzle-environment",
+  "name": "@siu-issiki/vitest-drizzle-pg",
   "version": "0.1.0",
   "description": "Vitest environment for Drizzle ORM with PostgreSQL - automatic transaction rollback per test case",
   "type": "module",
@@ -48,11 +48,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/siu-issiki/vitest-drizzle-environment.git"
+    "url": "git+https://github.com/siu-issiki/vitest-drizzle-pg.git"
   },
-  "homepage": "https://github.com/siu-issiki/vitest-drizzle-environment#readme",
+  "homepage": "https://github.com/siu-issiki/vitest-drizzle-pg#readme",
   "bugs": {
-    "url": "https://github.com/siu-issiki/vitest-drizzle-environment/issues"
+    "url": "https://github.com/siu-issiki/vitest-drizzle-pg/issues"
   },
   "engines": {
     "node": ">=18.0.0"

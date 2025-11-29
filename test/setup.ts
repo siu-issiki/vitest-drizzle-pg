@@ -6,7 +6,7 @@
  */
 
 import { beforeAll, afterAll } from 'vitest';
-import { setupDrizzleEnvironment } from '@siu-issiki/vitest-drizzle-environment';
+import { setupDrizzleEnvironment } from '@siu-issiki/vitest-drizzle-pg';
 import { db, initDb, dropTables, closeDb } from './db';
 
 // Setup before and after tests

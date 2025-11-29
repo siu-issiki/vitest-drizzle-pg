@@ -1,5 +1,5 @@
 /**
- * Tests for @siu-issiki/vitest-drizzle-environment
+ * Tests for @siu-issiki/vitest-drizzle-pg
  *
  * setupDrizzleEnvironment is already set up in setup.ts.
  * By mocking client.ts to return vitestDrizzle.client,

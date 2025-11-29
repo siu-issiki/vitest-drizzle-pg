@@ -1,7 +1,7 @@
-# @siu-issiki/vitest-drizzle-environment
+# @siu-issiki/vitest-drizzle-pg
 
-[![npm version](https://img.shields.io/npm/v/@siu-issiki/vitest-drizzle-environment.svg)](https://www.npmjs.com/package/@siu-issiki/vitest-drizzle-environment)
-[![CI](https://github.com/siu-issiki/vitest-drizzle-environment/actions/workflows/test.yml/badge.svg)](https://github.com/siu-issiki/vitest-drizzle-environment/actions/workflows/test.yml)
+[![npm version](https://img.shields.io/npm/v/@siu-issiki/vitest-drizzle-pg.svg)](https://www.npmjs.com/package/@siu-issiki/vitest-drizzle-pg)
+[![CI](https://github.com/siu-issiki/vitest-drizzle-pg/actions/workflows/test.yml/badge.svg)](https://github.com/siu-issiki/vitest-drizzle-pg/actions/workflows/test.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A Vitest environment for Drizzle ORM (PostgreSQL) that provides **automatic transaction rollback per test case**.
@@ -18,11 +18,11 @@ Inspired by [jest-prisma](https://github.com/Quramy/jest-prisma), this library e
 ## Installation
 
 ```bash
-npm install -D @siu-issiki/vitest-drizzle-environment
+npm install -D @siu-issiki/vitest-drizzle-pg
 # or
-pnpm add -D @siu-issiki/vitest-drizzle-environment
+pnpm add -D @siu-issiki/vitest-drizzle-pg
 # or
-yarn add -D @siu-issiki/vitest-drizzle-environment
+yarn add -D @siu-issiki/vitest-drizzle-pg
 ```
 
 ## Quick Start
@@ -31,7 +31,7 @@ yarn add -D @siu-issiki/vitest-drizzle-environment
 
 ```typescript
 // setup.ts
-import { setupDrizzleEnvironment } from '@siu-issiki/vitest-drizzle-environment';
+import { setupDrizzleEnvironment } from '@siu-issiki/vitest-drizzle-pg';
 import { db } from './db'; // Your Drizzle instance
 
 setupDrizzleEnvironment({
@@ -172,7 +172,7 @@ When using TypeScript, you can enable type inference for `vitestDrizzle.client` 
 ```typescript
 // env.d.ts
 import type { db } from './db';
-import type { VitestDrizzleContext } from '@siu-issiki/vitest-drizzle-environment';
+import type { VitestDrizzleContext } from '@siu-issiki/vitest-drizzle-pg';
 
 type DrizzleTransaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
@@ -245,7 +245,7 @@ vitest-drizzle-environment/
 └── package.json
 ```
 
-The `test/` directory has its own `package.json` and installs `@siu-issiki/vitest-drizzle-environment` as a local package using `file:..`. This allows testing with the same experience as actual package users.
+The `test/` directory has its own `package.json` and installs `@siu-issiki/vitest-drizzle-pg` as a local package using `file:..`. This allows testing with the same experience as actual package users.
 
 ## License
 
