@@ -235,7 +235,7 @@ pnpm test:watch
 ### Project Structure
 
 ```
-vitest-drizzle-environment/
+vitest-drizzle-pg/
 ├── src/                    # Library source code
 ├── dist/                   # Build output
 ├── test/                   # Tests (independent package)

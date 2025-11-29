@@ -1,5 +1,5 @@
 {
-  "name": "vitest-drizzle-environment-test",
+  "name": "vitest-drizzle-pg-test",
   "private": true,
   "type": "module",
   "scripts": {

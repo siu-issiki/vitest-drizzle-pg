@@ -1,5 +1,5 @@
 /**
- * @siu-issiki/vitest-drizzle-environment
+ * @siu-issiki/vitest-drizzle-pg
  *
  * Provides automatic transaction rollback per test case when using
  * Drizzle ORM (PostgreSQL) in Vitest tests.
@@ -10,7 +10,7 @@
  * @example
  * ```ts
  * // setup.ts (specified in vitest.config.ts setupFiles)
- * import { setupDrizzleEnvironment } from "@siu-issiki/vitest-drizzle-environment";
+ * import { setupDrizzleEnvironment } from "@siu-issiki/vitest-drizzle-pg";
  * import { db } from "./db";
  *
  * setupDrizzleEnvironment({

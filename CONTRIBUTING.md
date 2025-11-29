@@ -1,6 +1,6 @@
 # Contributing
 
-Contributions to @siu-issiki/vitest-drizzle-environment are welcome!
+Contributions to @siu-issiki/vitest-drizzle-pg are welcome!
 
 ## Development Environment Setup
 
@@ -14,8 +14,8 @@ Contributions to @siu-issiki/vitest-drizzle-environment are welcome!
 
 ```bash
 # Clone the repository
-git clone https://github.com/siu-issiki/vitest-drizzle-environment.git
-cd vitest-drizzle-environment
+git clone https://github.com/siu-issiki/vitest-drizzle-pg.git
+cd vitest-drizzle-pg
 
 # Install dependencies
 pnpm install

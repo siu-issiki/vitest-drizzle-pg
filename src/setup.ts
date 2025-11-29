@@ -17,7 +17,7 @@ import type {
  * @example
  * ```ts
  * // setup.ts (specified in vitest.config.ts setupFiles)
- * import { setupDrizzleEnvironment } from "@siu-issiki/vitest-drizzle-environment";
+ * import { setupDrizzleEnvironment } from "@siu-issiki/vitest-drizzle-pg";
  * import { db } from "./db";
  *
  * setupDrizzleEnvironment({
